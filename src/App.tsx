@@ -42,6 +42,8 @@ import { ResumenMaquinasView } from './components/views/ResumenMaquinasView';
 import { ResumenOpsView } from './components/views/ResumenOpsView';
 import { TurnosAgrupadosView } from './components/views/TurnosAgrupadosView';
 import { PrintableReport } from './components/PrintableReport';
+import { PWAInstallButton } from './components/PWAInstallButton';
+import { OfflineIndicator } from './components/OfflineIndicator';
 
 function crearFiltrosIniciales(): FiltrosConsulta {
   const hoy = new Date();
@@ -277,11 +279,14 @@ export default function App() {
 
   if (!session) {
     return (
-      <LoginView
-        onLoginSuccess={(s) => setSession(s)}
-        catalogoCount={catalogo.length}
-        maquinasCount={maquinasSheets.length}
-      />
+      <>
+        <LoginView
+          onLoginSuccess={(s) => setSession(s)}
+          catalogoCount={catalogo.length}
+          maquinasCount={maquinasSheets.length}
+        />
+        <OfflineIndicator />
+      </>
     );
   }
 
@@ -475,6 +480,8 @@ export default function App() {
                 <span>Migración PT</span>
               </button>
 
+              <PWAInstallButton />
+
               <button
                 type="button"
                 onClick={handleLogout}
@@ -548,6 +555,8 @@ export default function App() {
         resumenOps={resumenOps}
         filtros={filtros}
       />
+
+      <OfflineIndicator />
     </div>
   );
 }

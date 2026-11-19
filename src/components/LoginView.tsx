@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Lock, ArrowRight } from 'lucide-react';
 import { getSupabaseConfig, sbLogin } from '../services/supabase';
 import { SupabaseSession } from '../types';
+import { PWAInstallButton } from './PWAInstallButton';
 
 interface LoginViewProps {
   onLoginSuccess: (session: SupabaseSession) => void;
@@ -114,6 +115,10 @@ export const LoginView: React.FC<LoginViewProps> = ({
             {!cargando && <ArrowRight size={15} />}
           </button>
         </form>
+
+        <div className="mt-5 flex justify-center empty:hidden">
+          <PWAInstallButton />
+        </div>
       </div>
     </div>
   );
