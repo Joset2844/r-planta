@@ -319,7 +319,7 @@ export default function App() {
         <div className="max-w-[1440px] mx-auto px-4 sm:px-6 h-16 flex items-center justify-between gap-8">
           {/* Zone 1: Brand Title */}
           <span className="text-base sm:text-lg font-bold tracking-tight text-slate-900 whitespace-nowrap shrink-0 font-display">
-            Consultas Planta 2
+            Consulta de Producción
           </span>
 
           {/* Zone 2: Single-line View Navigation */}

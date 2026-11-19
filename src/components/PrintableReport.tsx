@@ -40,7 +40,7 @@ export const PrintableReport: React.FC<PrintableReportProps> = ({
       <div className="border-b-2 border-slate-900 pb-3 mb-4 flex items-end justify-between">
         <div>
           <div className="text-[11px] font-semibold text-amber-700">
-            Supervisión Planta 2 — Reporte Oficial de Consulta
+            Consulta de Producción — Reporte Oficial
           </div>
           <h1 className="text-xl font-bold text-slate-900 mt-0.5">
             {vista === 'maquinas'

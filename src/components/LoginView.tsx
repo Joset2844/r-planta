@@ -44,10 +44,10 @@ export const LoginView: React.FC<LoginViewProps> = ({
       <div className="w-full max-w-md bg-white border border-slate-200 rounded-xl p-8">
         <div className="mb-6">
           <p className="text-xs font-medium text-amber-700 mb-1.5">
-            Supervisión Planta 2
+            Reportes y Exportación
           </p>
           <h1 className="text-2xl font-bold tracking-tight text-slate-900">
-            Consultas y Reportes
+            Consulta de Producción
           </h1>
           <p className="text-sm text-slate-600 mt-2 leading-relaxed">
             Inicia sesión con tu cuenta registrada para consultar, filtrar por máquina, fechas y OP, imprimir y exportar a Excel los turnos guardados.

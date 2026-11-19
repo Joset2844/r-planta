@@ -15,10 +15,10 @@ export default defineConfig(() => {
         includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'icon.svg'],
         manifest: {
           id: '/',
-          name: 'Consultas Planta 2',
-          short_name: 'Planta 2',
+          name: 'Consulta de Producción',
+          short_name: 'Producción',
           description:
-            'Consultas, filtros por máquina, fechas y OP, impresión y exportación a Excel de Supervisión Planta 2.',
+            'Consultas, filtros por máquina, fechas y OP, impresión y exportación a Excel de registros de producción.',
           theme_color: '#0F172A',
           background_color: '#F8FAFC',
           display: 'standalone',

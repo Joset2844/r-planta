@@ -66,11 +66,11 @@ export async function exportarReporteExcel(params: {
     minute: '2-digit',
   });
   const filtroResumen = describirFiltros(filtros);
-  const nombreArchivo = `reporte_planta2_${hoyIso}.xlsx`;
+  const nombreArchivo = `reporte_produccion_${hoyIso}.xlsx`;
 
   try {
     const wb = new ExcelJS.Workbook();
-    wb.creator = 'Consultas Planta 2';
+    wb.creator = 'Consulta de Producción';
     wb.created = ahora;
 
     // ================== HOJA 1: DETALLE FILTRADO ==================
@@ -94,7 +94,7 @@ export async function exportarReporteExcel(params: {
     ws1.mergeCells(1, 1, 1, 13);
     const rTitle1 = ws1.getRow(1);
     rTitle1.height = 24;
-    rTitle1.getCell(1).value = 'REPORTE DE PRODUCCIÓN — SUPERVISIÓN PLANTA 2';
+    rTitle1.getCell(1).value = 'REPORTE DE PRODUCCIÓN — CONSULTA GENERAL';
     rTitle1.getCell(1).font = { bold: true, size: 13, color: { argb: 'FFFFFFFF' } };
     rTitle1.getCell(1).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF0F172A' } };
     rTitle1.getCell(1).alignment = { horizontal: 'center', vertical: 'middle' };

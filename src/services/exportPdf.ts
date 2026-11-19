@@ -35,7 +35,7 @@ export function exportarReportePdf(params: {
       ? 'REPORTE CONSOLIDADO POR MÁQUINA'
       : vista === 'ops'
       ? 'REPORTE CONSOLIDADO POR ORDEN DE PRODUCCIÓN (OP)'
-      : 'REPORTE DETALLADO DE PRODUCCIÓN — PLANTA 2';
+      : 'REPORTE DETALLADO DE PRODUCCIÓN';
 
   const drawBanner = () => {
     doc.setFillColor(15, 23, 42);
@@ -238,14 +238,14 @@ export function exportarReportePdf(params: {
     doc.setFont('helvetica', 'normal');
     doc.setFontSize(7);
     doc.setTextColor(100, 116, 139);
-    doc.text(`Generado: ${generado} · Consultas Planta 2`, marginX, pageHeight - 5.5);
+    doc.text(`Generado: ${generado} · Consulta de Producción`, marginX, pageHeight - 5.5);
     doc.text(`Página ${p} de ${totalPages}`, marginX + contentWidth, pageHeight - 5.5, {
       align: 'right',
     });
   }
 
   const hoy = new Date().toISOString().slice(0, 10);
-  const nombre = `reporte_planta2_${vista}_${hoy}.pdf`;
+  const nombre = `reporte_produccion_${vista}_${hoy}.pdf`;
   doc.save(nombre);
   return nombre;
 }
