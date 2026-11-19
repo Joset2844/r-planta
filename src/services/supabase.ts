@@ -141,22 +141,27 @@ export async function sbRenovarSesion(
   return sbRenovandoPromesa;
 }
 
-export async function sbFetch<T = any>(
+async function sbFetchResponse(
   cfg: SupabaseConfig,
   ruta: string,
   session?: SupabaseSession | null,
   onSessionRenewed?: (newSession: SupabaseSession) => void,
+  options?: { prefer?: string; signal?: AbortSignal },
   reintentado = false
-): Promise<T> {
+): Promise<{ data: any; totalCount: number | null }> {
   const headers: Record<string, string> = {
     apikey: cfg.key,
     Authorization: 'Bearer ' + (session ? session.access_token : cfg.key),
   };
+  if (options?.prefer) {
+    headers['Prefer'] = options.prefer;
+  }
 
   const resp = await fetch(`${cfg.url}/rest/v1/${ruta}`, {
     method: 'GET',
     headers,
     cache: 'no-store',
+    signal: options?.signal,
   });
 
   if (!resp.ok) {
@@ -166,7 +171,7 @@ export async function sbFetch<T = any>(
         const renewed = await sbRenovarSesion(cfg, session);
         if (renewed) {
           onSessionRenewed?.(renewed);
-          return sbFetch<T>(cfg, ruta, renewed, onSessionRenewed, true);
+          return sbFetchResponse(cfg, ruta, renewed, onSessionRenewed, options, true);
         }
       } catch {
         saveSession(null);
@@ -179,9 +184,28 @@ export async function sbFetch<T = any>(
     throw new Error(`HTTP ${resp.status}: ${text}`);
   }
 
+  let totalCount: number | null = null;
+  const contentRange = resp.headers.get('content-range');
+  if (contentRange) {
+    const match = contentRange.match(/\/(\d+)$/);
+    if (match) {
+      totalCount = parseInt(match[1], 10);
+    }
+  }
+
   const responseText = await resp.text();
-  if (!responseText || !responseText.trim()) return [] as any;
-  return JSON.parse(responseText);
+  const data = !responseText || !responseText.trim() ? [] : JSON.parse(responseText);
+  return { data, totalCount };
+}
+
+export async function sbFetch<T = any>(
+  cfg: SupabaseConfig,
+  ruta: string,
+  session?: SupabaseSession | null,
+  onSessionRenewed?: (newSession: SupabaseSession) => void
+): Promise<T> {
+  const { data } = await sbFetchResponse(cfg, ruta, session, onSessionRenewed);
+  return data;
 }
 
 export async function fetchTurnosRango(params: {
@@ -190,9 +214,10 @@ export async function fetchTurnosRango(params: {
   fechaDesde?: string;
   fechaHasta?: string;
   onSessionRenewed?: (newSession: SupabaseSession) => void;
+  signal?: AbortSignal;
 }): Promise<TurnoDBRow[]> {
-  const { cfg, session, fechaDesde, fechaHasta, onSessionRenewed } = params;
-  const PAG = 500;
+  const { cfg, session, fechaDesde, fechaHasta, onSessionRenewed, signal } = params;
+  const PAG = 100;
   let offset = 0;
   const acumulados: TurnoDBRow[] = [];
 
@@ -201,12 +226,25 @@ export async function fetchTurnosRango(params: {
     if (fechaDesde) q += `&fecha=gte.${encodeURIComponent(fechaDesde)}`;
     if (fechaHasta) q += `&fecha=lte.${encodeURIComponent(fechaHasta)}`;
 
-    const rows = await sbFetch<TurnoDBRow[]>(cfg, q, session, onSessionRenewed);
+    const { data: rows, totalCount } = await sbFetchResponse(
+      cfg,
+      q,
+      session,
+      onSessionRenewed,
+      { prefer: 'count=exact', signal }
+    );
+
     if (!Array.isArray(rows) || rows.length === 0) break;
     acumulados.push(...rows);
-    if (rows.length < PAG) break;
-    offset += PAG;
-    if (offset >= 5000) break; // safety cap
+    offset += rows.length;
+
+    if (totalCount !== null) {
+      if (acumulados.length >= totalCount) break;
+    } else if (rows.length < PAG) {
+      break;
+    }
+
+    if (offset >= 10000) break; // safety cap
   }
 
   return acumulados;

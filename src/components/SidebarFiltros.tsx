@@ -98,7 +98,7 @@ export const SidebarFiltros: React.FC<SidebarFiltrosProps> = ({
     });
   }, [maquinasDisponibles, filtros.areaFiltro, filtros.tipoProductoFiltro, busquedaMaquina]);
 
-  const aplicarPresetFecha = (preset: 'hoy' | '7d' | '30d' | 'mes' | 'todo') => {
+  const aplicarPresetFecha = (preset: 'hoy' | '7d' | '30d' | 'mes' | 'mes_ant' | 'todo') => {
     const hoy = new Date();
     const hoyStr = toLocalIsoDate(hoy);
     let d = '';
@@ -119,9 +119,13 @@ export const SidebarFiltros: React.FC<SidebarFiltrosProps> = ({
     } else if (preset === 'mes') {
       d = `${hoy.getFullYear()}-${String(hoy.getMonth() + 1).padStart(2, '0')}-01`;
       h = hoyStr;
+    } else if (preset === 'mes_ant') {
+      const primerDiaMesAnt = new Date(hoy.getFullYear(), hoy.getMonth() - 1, 1);
+      const ultimoDiaMesAnt = new Date(hoy.getFullYear(), hoy.getMonth(), 0);
+      d = toLocalIsoDate(primerDiaMesAnt);
+      h = toLocalIsoDate(ultimoDiaMesAnt);
     }
     onChange({ ...filtros, fechaDesde: d, fechaHasta: h });
-    onBuscarRangoServidor(d, h);
   };
 
   const agregarOp = (op: string) => {
@@ -238,6 +242,7 @@ export const SidebarFiltros: React.FC<SidebarFiltrosProps> = ({
             { id: '7d', label: '7 días' },
             { id: '30d', label: '30 días' },
             { id: 'mes', label: 'Mes actual' },
+            { id: 'mes_ant', label: 'Mes anterior' },
             { id: 'todo', label: 'Todo' },
           ].map((p) => (
             <button

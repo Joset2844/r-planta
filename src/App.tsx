@@ -94,40 +94,62 @@ export default function App() {
       .catch(() => {});
   }, [session?.user_id]);
 
+  const abortRef = React.useRef<AbortController | null>(null);
+  const sessionRef = React.useRef(session);
+  sessionRef.current = session;
+
   // Fetch shifts from Supabase for a given date range
   const cargarTurnosServidor = useCallback(
     async (desde: string, hasta: string) => {
-      if (!session) return;
+      const sesionActual = sessionRef.current;
+      if (!sesionActual) return;
+      if (desde && hasta && desde > hasta) return;
+
+      abortRef.current?.abort();
+      const controller = new AbortController();
+      abortRef.current = controller;
+
       const cfg = getSupabaseConfig();
       setCargandoTurnos(true);
       try {
         const rows = await fetchTurnosRango({
           cfg,
-          session,
+          session: sesionActual,
           fechaDesde: desde || undefined,
           fechaHasta: hasta || undefined,
           onSessionRenewed: (renewed) => setSession(renewed),
+          signal: controller.signal,
         });
-        setTurnosDB(rows);
+        if (!controller.signal.aborted) {
+          setTurnosDB(rows);
+        }
       } catch (err: any) {
+        if (err?.name === 'AbortError') return;
         const msg = err?.message || 'No se pudieron consultar los turnos.';
         if (msg.toLowerCase().includes('sesión vencida')) {
           setSession(null);
         }
         mostrarAviso('error', msg);
       } finally {
-        setCargandoTurnos(false);
+        if (abortRef.current === controller) {
+          setCargandoTurnos(false);
+        }
       }
     },
-    [session, mostrarAviso]
+    [mostrarAviso]
   );
 
-  // Initial load once logged in
+  // Automatically fetch from Supabase whenever session or date range changes
   useEffect(() => {
-    if (session) {
-      cargarTurnosServidor(filtros.fechaDesde, filtros.fechaHasta);
+    if (!session?.user_id) return;
+    if (filtros.fechaDesde && filtros.fechaHasta && filtros.fechaDesde > filtros.fechaHasta) {
+      return;
     }
-  }, [session?.user_id]);
+    const timer = setTimeout(() => {
+      cargarTurnosServidor(filtros.fechaDesde, filtros.fechaHasta);
+    }, 250);
+    return () => clearTimeout(timer);
+  }, [session?.user_id, filtros.fechaDesde, filtros.fechaHasta, cargarTurnosServidor]);
 
   const handleLogout = () => {
     saveSession(null);

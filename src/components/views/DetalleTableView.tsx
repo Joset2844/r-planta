@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { ArrowDown, ArrowUp, ArrowUpDown, ChevronLeft, ChevronRight } from 'lucide-react';
 import { RegistroFiltrado } from '../../types';
 import { etiquetaArea, etiquetaTurno, formatearFechaCorta } from '../../services/catalogHelpers';
@@ -22,6 +22,10 @@ export const DetalleTableView: React.FC<DetalleTableViewProps> = ({
   const [sortAsc, setSortAsc] = useState(false);
   const [pagina, setPagina] = useState(1);
   const POR_PAGINA = 100;
+
+  useEffect(() => {
+    setPagina(1);
+  }, [registros]);
 
   const ordenados = useMemo(() => {
     const copia = [...registros];
