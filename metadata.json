@@ -1,0 +1,6 @@
+{
+  "name": "Consultas Planta 2",
+  "description": "Centro de consulta, filtrado por máquina, fechas y OP, visualización, impresión y exportación a Excel de los registros de producción de Supervisión Planta 2.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
